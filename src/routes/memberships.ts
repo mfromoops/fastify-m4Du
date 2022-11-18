@@ -6,7 +6,9 @@ const memberships: FastifyPluginAsync = async (
   opts
 ): Promise<void> => {
   fastify.get("/memberships/", async function (request, reply) {
-    return prisma.projectMembership.findMany();
+    return prisma.projectMembership.findMany({
+      include: { user: true, project: true },
+    });
   });
   fastify.get(
     "/memberships/project/:project_id",
@@ -24,6 +26,10 @@ const memberships: FastifyPluginAsync = async (
           project: {
             id: project.id,
           },
+        },
+        include: {
+          user: true,
+          project: true,
         },
       });
     }
@@ -43,10 +49,28 @@ const memberships: FastifyPluginAsync = async (
           id: user.id,
         },
       },
+      include: {
+        user: true,
+        project: true,
+      },
     });
   });
   fastify.post("/memberships/", async function (request, reply) {
-    return prisma.projectMembership.create(request.body as any);
+    let body = request.body as { project_id: number; user_id: number };
+    return prisma.projectMembership.create({
+      data: {
+        project: {
+          connect: {
+            id: body.project_id,
+          },
+        },
+        user: {
+          connect: {
+            id: body.user_id,
+          },
+        },
+      },
+    });
   });
   fastify.delete("/memberships/", async function (request, reply) {
     let body = request.body as { id: number };

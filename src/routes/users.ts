@@ -17,15 +17,32 @@ const users: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     return user;
   });
   fastify.post("/users/", async function (request, reply) {
-    return prisma.user.create(request.body as any);
+    let body = request.body as { name: string; email: string; type: string };
+    let user = await prisma.user.create({
+      data: {
+        name: body.name,
+        email: body.email,
+        type: body.type,
+      },
+    });
+    return user;
   });
   fastify.put("/users/", async function (request, reply) {
-    let body = request.body as { id: number };
+    let body = request.body as {
+      id: number;
+      name: string;
+      email: string;
+      type: string;
+    };
     return prisma.user.update({
       where: {
         id: body.id,
       },
-      data: request.body as any,
+      data: {
+        name: body.name,
+        email: body.email,
+        type: body.type,
+      },
     });
   });
   fastify.delete("/users/", async function (request, reply) {

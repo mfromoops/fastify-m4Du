@@ -6,7 +6,13 @@ const projects: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     return prisma.project.findMany();
   });
   fastify.post("/projects/", async function (request, reply) {
-    return prisma.project.create(request.body as any);
+    let body = request.body as { name: string; description: string };
+    return prisma.project.create({
+      data: {
+        name: body.name,
+        description: body.description,
+      },
+    });
   });
   fastify.put("/projects/", async function (request, reply) {
     let body = request.body as { id: number };
