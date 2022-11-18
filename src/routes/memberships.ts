@@ -35,9 +35,9 @@ const memberships: FastifyPluginAsync = async (
     }
   );
   fastify.get("/memberships/user/:user_id", async function (request, reply) {
-    let params = request.params as { user_id: number };
+    let params = request.params as { user_id: string };
     let user = await prisma.user.findUnique({
-      where: { id: params.user_id },
+      where: { id: Number(params.user_id) },
     });
     if (!user) {
       reply.code(404);

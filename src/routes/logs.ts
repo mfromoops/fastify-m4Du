@@ -3,7 +3,7 @@ import { FastifyPluginAsync } from "fastify";
 const prisma = new PrismaClient();
 const logs: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   fastify.get("/logs/", async function (request, reply) {
-    return prisma.timeLog.findMany();
+    return prisma.timeLog.findMany({ include: { project: true, user: true } });
   });
   fastify.post("/logs/start", async function (request, reply) {
     let body = request.body as { project_id: number; user_id: number };
@@ -67,9 +67,9 @@ const logs: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     });
   });
   fastify.get("/logs/project/:project_id", async function (request, reply) {
-    let params = request.params as { project_id: number };
+    let params = request.params as { project_id: string };
     let project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: Number(params.project_id) },
     });
     if (!project) {
       reply.code(404);
@@ -88,9 +88,10 @@ const logs: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     });
   });
   fastify.get("/logs/user/:user_id", async function (request, reply) {
-    let params = request.params as { user_id: number };
+    let params = request.params as { user_id: string };
+    console.log(typeof params.user_id);
     let user = await prisma.user.findUnique({
-      where: { id: params.user_id },
+      where: { id: Number(params.user_id) },
     });
     if (!user) {
       reply.code(404);
@@ -100,7 +101,7 @@ const logs: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     return prisma.timeLog.findMany({
       where: {
         user: {
-          id: user.id,
+          id: +user.id,
         },
       },
       include: {

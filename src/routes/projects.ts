@@ -5,6 +5,17 @@ const projects: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   fastify.get("/projects/", async function (request, reply) {
     return prisma.project.findMany();
   });
+  fastify.get("/projects/:id", async function (request, reply) {
+    const params = request.params as { id: string };
+    let project = await prisma.project.findUnique({
+      where: { id: Number(params.id) },
+    });
+    if (!project) {
+      reply.code(404);
+      return { error: "Project not found" };
+    }
+    return project;
+  });
   fastify.post("/projects/", async function (request, reply) {
     let body = request.body as { name: string; description: string };
     return prisma.project.create({

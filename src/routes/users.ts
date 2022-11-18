@@ -6,9 +6,9 @@ const users: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     return prisma.user.findMany();
   });
   fastify.get("/users/:id", async function (request, reply) {
-    let params = request.params as { id: number };
+    let params = request.params as { id: string };
     let user = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id: Number(params.id) },
     });
     if (!user) {
       reply.code(404);
