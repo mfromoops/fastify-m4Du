@@ -6,7 +6,13 @@ const logs: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     return prisma.timeLog.findMany({ include: { project: true, user: true } });
   });
   fastify.post("/logs/start", async function (request, reply) {
-    let body = request.body as { project_id: number; user_id: number };
+    let body = request.body as {
+      project_id: number;
+      user_id: number;
+      details: string;
+      session_name: string;
+      log_type: string;
+    };
     let project = await prisma.project.findUnique({
       where: { id: body.project_id },
     });
@@ -50,7 +56,9 @@ const logs: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         date: new Date(),
         start_time: new Date(),
         end_time: new Date(),
-        type: "work",
+        log_type: "Work",
+        session_name: body.session_name,
+        details: body.details,
       },
     });
     return log;
