@@ -13,15 +13,16 @@ datasource db {
 
 model TimeLog {
   id            Int      @default(autoincrement()) @id
-  user          User     @relation(fields: [userId], references: [id])
-  userId        Int
+  user_id       Int
+  user          User     @relation(fields: [user_id], references: [id])
   date          DateTime
   start_time    DateTime
   end_time      DateTime?
   details       String
-  log_type     String
+  log_type      String
   session_name  String
-  project Project @relation(fields: [id], references: [id])
+  project_id    Int
+  project Project @relation(fields: [project_id], references: [id])
 }
 
 model User {
