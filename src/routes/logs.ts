@@ -64,6 +64,13 @@ const logs: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   });
   fastify.put("/logs/end", async function (request, reply) {
     let body = request.body as { log_id: number };
+    let log = await prisma.timeLog.findUnique({
+      where: { id: body.log_id },
+    });
+    if (!log) {
+      reply.code(404);
+      return { error: "Log not found" };
+    }
     return prisma.timeLog.update({
       where: {
         id: body.log_id,
