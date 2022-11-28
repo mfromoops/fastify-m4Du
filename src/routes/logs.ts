@@ -55,7 +55,6 @@ const logs: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         },
         date: new Date(),
         start_time: new Date(),
-        end_time: new Date(),
         log_type: "Work",
         session_name: body.session_name,
         details: body.details,
