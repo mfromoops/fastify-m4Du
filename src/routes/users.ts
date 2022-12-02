@@ -16,6 +16,18 @@ const users: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     }
     return user;
   });
+
+  fastify.get("/users/email/:email", async function (request, reply) {
+    let params = request.params as { email: string };
+    let user = await prisma.user.findUnique({
+      where: { email: params.email },
+    });
+    if (!user) {
+      reply.code(404);
+      return { error: "User not found" };
+    }
+    return user;
+  });
   fastify.post("/users/", async function (request, reply) {
     let body = request.body as { name: string; email: string; type: string };
     let user = await prisma.user.create({
