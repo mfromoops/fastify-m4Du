@@ -58,10 +58,14 @@ const users: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     });
   });
   fastify.delete("/users/:id", async function (request, reply) {
-    let body = request.params as { id: number };
+    let body = request.params as { id: string };
+    if (!Number(body.id)) {
+      reply.code(400);
+      return { error: "Invalid id" };
+    }
     return prisma.user.delete({
       where: {
-        id: body.id,
+        id: Number(body.id),
       },
     });
   });
