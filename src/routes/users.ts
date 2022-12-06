@@ -57,8 +57,8 @@ const users: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       },
     });
   });
-  fastify.delete("/users/", async function (request, reply) {
-    let body = request.body as { id: number };
+  fastify.delete("/users/:id", async function (request, reply) {
+    let body = request.params as { id: number };
     return prisma.user.delete({
       where: {
         id: body.id,
