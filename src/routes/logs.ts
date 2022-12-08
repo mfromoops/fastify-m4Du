@@ -7,21 +7,21 @@ const logs: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   });
   fastify.post("/logs/start", async function (request, reply) {
     let body = request.body as {
-      project_id: number;
-      user_id: number;
+      project_id: string;
+      user_id: string;
       details: string;
       session_name: string;
       log_type: string;
     };
     let project = await prisma.project.findUnique({
-      where: { id: body.project_id },
+      where: { id: Number(body.project_id) },
     });
     if (!project) {
       reply.code(404);
       return { error: "Project not found" };
     }
     let user = await prisma.user.findUnique({
-      where: { id: body.user_id },
+      where: { id: Number(body.user_id) },
     });
     if (!user) {
       reply.code(404);
@@ -63,9 +63,9 @@ const logs: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     return log;
   });
   fastify.put("/logs/end", async function (request, reply) {
-    let body = request.body as { log_id: number };
+    let body = request.body as { log_id: string };
     let log = await prisma.timeLog.findUnique({
-      where: { id: body.log_id },
+      where: { id: Number(body.log_id) },
     });
     if (!log) {
       reply.code(404);
@@ -73,7 +73,7 @@ const logs: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     }
     return prisma.timeLog.update({
       where: {
-        id: body.log_id,
+        id: Number(body.log_id),
       },
       data: {
         end_time: new Date(),
