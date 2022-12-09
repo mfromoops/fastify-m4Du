@@ -115,10 +115,10 @@ const memberships: FastifyPluginAsync = async (
     });
   });
   fastify.delete("/memberships/", async function (request, reply) {
-    let body = request.body as { id: number };
+    let body = request.params as { member_id: string };
     return prisma.projectMembership.delete({
       where: {
-        id: body.id,
+        id: Number(body.member_id),
       },
     });
   });
