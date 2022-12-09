@@ -55,6 +55,30 @@ const memberships: FastifyPluginAsync = async (
       },
     });
   });
+  fastify.get(
+    "/memberships/project/:project_id",
+    async function (request, reply) {
+      let params = request.params as { project_id: string };
+      let project = await prisma.project.findUnique({
+        where: { id: Number(params.project_id) },
+      });
+      if (!project) {
+        reply.code(404);
+        return { error: "Project not found" };
+      }
+      return prisma.projectMembership.findMany({
+        where: {
+          project: {
+            id: project.id,
+          },
+        },
+        include: {
+          user: true,
+          project: true,
+        },
+      });
+    }
+  );
   fastify.post("/memberships/", async function (request, reply) {
     let body = request.body as { project_id: number; user_id: number };
     return prisma.projectMembership.create({
