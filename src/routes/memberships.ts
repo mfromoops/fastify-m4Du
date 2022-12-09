@@ -114,8 +114,17 @@ const memberships: FastifyPluginAsync = async (
       },
     });
   });
-  fastify.delete("/memberships/", async function (request, reply) {
+  fastify.delete("/memberships/:member_id", async function (request, reply) {
     let body = request.params as { member_id: string };
+    const membership = await prisma.projectMembership.findUnique({
+      where: {
+        id: Number(body.member_id),
+      },
+    });
+    if (!membership) {
+      reply.code(404);
+      return { error: "Membership not found" };
+    }
     return prisma.projectMembership.delete({
       where: {
         id: Number(body.member_id),
