@@ -38,6 +38,7 @@ const memberships: FastifyPluginAsync = async (
       let project = await prisma.project.findUnique({
         where: { id: Number(params.project_id) },
       });
+
       if (!project) {
         reply.code(404);
         return { error: "Project not found" };
@@ -53,6 +54,42 @@ const memberships: FastifyPluginAsync = async (
           project: true,
         },
       });
+    }
+  );
+  fastify.get(
+    "/memberships/project/:project_id/member-status",
+    async function (request, reply) {
+      let params = request.params as { project_id: string };
+      let project = await prisma.project.findUnique({
+        where: { id: Number(params.project_id) },
+      });
+      if (!project) {
+        reply.code(404);
+        return { error: "Project not found" };
+      }
+      const users = await prisma.user.findMany();
+
+      const current_members = await prisma.projectMembership.findMany({
+        where: {
+          project: {
+            id: project.id,
+          },
+        },
+        include: {
+          user: true,
+          project: true,
+        },
+      });
+
+      // add a new property to each user object where the value is true if the user is a member of the project
+      const users_with_membership_status = users.map((user) => {
+        const is_member = current_members.some(
+          (member) => member.user.id === user.id
+        );
+        return { ...user, is_member };
+      });
+
+      return users_with_membership_status;
     }
   );
   fastify.post("/memberships/", async function (request, reply) {
