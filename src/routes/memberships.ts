@@ -10,30 +10,6 @@ const memberships: FastifyPluginAsync = async (
       include: { user: true, project: true },
     });
   });
-  fastify.get(
-    "/memberships/project/:project_id",
-    async function (request, reply) {
-      let params = request.params as { project_id: number };
-      let project = await prisma.project.findUnique({
-        where: { id: params.project_id },
-      });
-      if (!project) {
-        reply.code(404);
-        return { error: "Project not found" };
-      }
-      return prisma.projectMembership.findMany({
-        where: {
-          project: {
-            id: project.id,
-          },
-        },
-        include: {
-          user: true,
-          project: true,
-        },
-      });
-    }
-  );
   fastify.get("/memberships/user/:user_id", async function (request, reply) {
     let params = request.params as { user_id: string };
     let user = await prisma.user.findUnique({
