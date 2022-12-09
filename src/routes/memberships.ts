@@ -86,7 +86,12 @@ const memberships: FastifyPluginAsync = async (
         const is_member = current_members.some(
           (member) => member.user.id === user.id
         );
-        return { ...user, is_member };
+        let membership_id = null;
+        if (is_member)
+          membership_id = current_members.find(
+            (member) => member.user.id === user.id
+          )?.id;
+        return { ...user, is_member, membership_id };
       });
 
       return users_with_membership_status;
